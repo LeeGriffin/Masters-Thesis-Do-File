@@ -3,7 +3,7 @@
 *****the middle is mostly cleaning data and setting things up 140 - 217)*****
 *****the end are my regressions (217 - 304)*****
 
-use "E:\690\Data Sets\9 21 data sets\Base data.dta", clear
+use "Base Dateset Here", clear*****
 
 egen comb_gini5 = rmean( ds_gini wdi_gini)
 label var comb_gini5 "Averaged Gini Scores"
@@ -136,7 +136,7 @@ label var ht_colonial "colonial origians"
 label var p_democ "Institionlized democarcies"
 label var p_durable "regeium durabilty"
 
-save "E:\690\Data Sets\9 21 data sets\base3.dta", replace
+*****save "Optional Save of Base Dataset", replace*****
 
 *****creating new independent variables*****
 
@@ -150,20 +150,19 @@ label var pctaidIO_gle "IO precent of aid of GDP from GLE"
 label var pctaidC_gle "C precent of aid of GDP from GLE"
 label var pctaidC_wdi "C precent of aid of GDP from WDI"
 
-save "E:\690\Data Sets\9 21 data sets\base3.dta", replace
+save "Save Base Dataset", replace
 
-*****Merging the country names to my data set*****
+*****Merging the country names to my data set***** (Yeah this probably could have been done an easier way)
 
-use "E:\690\Data Sets\9 21 data sets\Base data.dta", clear
+use "Base Date Set", clear
 keep ccode cname year
 gen year5 = 5*floor(year/5) if year >= 1946 
 drop year
 collapse (last) cname, by (ccode year) 
-save "E:\690\Data Sets\9 21 data sets\merge2.dta", replace
-
+save "Merge Data set"
 merge 1:1 ccode year5 using "E:\690\Data Sets\9 21 data sets\base3.dta"
 
-save "E:\690\Data Sets\9 21 data sets\base3.dta", replace
+save "Base Dataset2", replace
 
 *****editing/ scaling my variables*****
 
@@ -214,6 +213,8 @@ label var region7 "South-East Asia"
 label var region8 "South Asia"
 label var region9 "The Pacific"
 label var region10 "The Caribbean"
+
+*****If you are using the final data sets, then you can start here*****
 
 *****regressions (tables 1 and 2 are sum stats)*****
 
