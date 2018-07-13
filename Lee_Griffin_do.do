@@ -14,8 +14,8 @@ gen wdi_realgdp = wdi_gdpcapcur * wdi_pop
 
 local startyear "1946"
 
-*I collapsed my original dataset into 5-year panels, I only started with 5 
-*or so variables, but little by little that grew to 76 variables
+*****I collapsed my original dataset into 5-year panels, I only started with 5*****
+*****or so variables, but little by little that grew to 76 variables*****
 
 gen year5 = 5*floor(year/5) if year >= `startyear'
 
@@ -32,7 +32,7 @@ wdi_oilrent wdi_mortinf wdi_lifexp wdi_internet wdi_export wdi_co2 uds_mean ///
 ross_oil_exp ictd_taxexsc dr_sg dr_pg dr_ig dr_eg wdi_gdpind wdi_gdpser ///
 ht_region dpi_cemo arda_chprtpct, by (ccode year5)
 
-*Creating my Panel Var
+*****Creating my Panel Var*****
 
 gen panel = 0
 replace panel =1 if year == 1945
@@ -56,7 +56,7 @@ rename wdi_gini wdi_gini5
 rename aid_crsc aid_crsc5
 rename aid_crsio aid_crsio5
 
-*Relabeling Vars
+*****Relabeling Vars*****
 
 label var arda_chprtpct "% of pop is prodestent"
 label var dpi_cemo "is chief exutive a milaty officer?"
@@ -138,7 +138,7 @@ label var p_durable "regeium durabilty"
 
 save "E:\690\Data Sets\9 21 data sets\base3.dta", replace
 
-*creating new independent variables
+*****creating new independent variables*****
 
 gen pctaidIO_wdi = aid_crsio/wdi_realgdp
 gen pctaidIO_gle = aid_crsio/gle_gdp2
@@ -152,7 +152,7 @@ label var pctaidC_wdi "C precent of aid of GDP from WDI"
 
 save "E:\690\Data Sets\9 21 data sets\base3.dta", replace
 
-*Merging the country names to my data set
+*****Merging the country names to my data set*****
 
 use "E:\690\Data Sets\9 21 data sets\Base data.dta", clear
 keep ccode cname year
@@ -165,7 +165,8 @@ merge 1:1 ccode year5 using "E:\690\Data Sets\9 21 data sets\base3.dta"
 
 save "E:\690\Data Sets\9 21 data sets\base3.dta", replace
 
-*editing/ scaling my variables
+*****editing/ scaling my variables*****
+
 replace ht_colonial = 1 if ht_colonial >= 1
 replace icrg_qog = (icrg/-1)
 replace icrg_qog = (icrg + 1)
@@ -214,11 +215,12 @@ label var region8 "South Asia"
 label var region9 "The Pacific"
 label var region10 "The Caribbean"
 
-*regressions (tables 1 and 2 are sum stats)
+*****regressions (tables 1 and 2 are sum stats)*****
 
 xtset ccode panel
 
-*table3
+*****table3*****
+
 xtreg bci pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
 outreg2 using E:\auto5.doc, replace drop(time* region*) ctitle(BCI IO) 
 xtreg ti_cpi pctaidIO_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
@@ -232,7 +234,8 @@ outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CPI C)
 xtreg wbgi_cce pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
 outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CCE C)  
 
-*table4
+*****table4*****
+
 xtreg bci pctaidIO_wdi gd_ptss wdi_lngdpcap p_durable  time* , fe 
 outreg2 using E:\auto.doc, replace drop(time*) ctitle(BCI IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 xtreg ti_cpi pctaidIO_wdi gd_ptss  wdi_lngdpcap p_dur time*, fe
