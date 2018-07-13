@@ -1,7 +1,7 @@
-*Hi! so below is the entire do file from my master’s thesis, 
-*the beginning is just collapsing and relabeling variables (22 - 139)
-*the middle is mostly cleaning data and setting things up 140 - 217)
-*the end are my regressions (217 - 304)
+*****Hi! so below is the entire do file from my master’s thesis, *****
+*****the beginning is just collapsing and relabeling variables (22 - 139)*****
+*****the middle is mostly cleaning data and setting things up 140 - 217)*****
+*****the end are my regressions (217 - 304)*****
 
 use "E:\690\Data Sets\9 21 data sets\Base data.dta", clear
 
@@ -219,7 +219,14 @@ label var region10 "The Caribbean"
 
 xtset ccode panel
 
-*****table3*****
+*****might have to install some stuff*****
+ssc install outreg2 
+ssc install xtabond2
+ssc install ivreg2
+
+*****you can take the outreg2's out, they are edited for my paper*****
+
+*****table3***** (Just a standard OLS)
 
 xtreg bci pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
 outreg2 using E:\auto5.doc, replace drop(time* region*) ctitle(BCI IO) 
@@ -234,7 +241,7 @@ outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CPI C)
 xtreg wbgi_cce pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
 outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CCE C)  
 
-*****table4*****
+*****table4***** (Fixed Effect Model)
 
 xtreg bci pctaidIO_wdi gd_ptss wdi_lngdpcap p_durable  time* , fe 
 outreg2 using E:\auto.doc, replace drop(time*) ctitle(BCI IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
@@ -249,7 +256,8 @@ outreg2 using E:\auto.doc, append drop(time*) ctitle(CPI C)  addtext(Hanson J P-
 xtreg wbgi_cce pctaidC_wdi  gd_ptss  wdi_lngdpcap p_dur time*, fe
 outreg2 using E:\auto.doc, append drop(time*) ctitle(CCE C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 
-*table5
+*****table5***** (Random Effects)
+
 xtreg bci pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
 outreg2 using E:\auto2.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 xtreg ti_cpi pctaidIO_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
@@ -263,7 +271,8 @@ outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(CPI C)  addtext(Re
 xtreg wbgi_cce pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
 outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 
-*table6
+*****table6***** (IV 2SLS (No fixed effects))
+
 ivreg2 bci gd_ptss fe_etfra wdi_lngdpcap p_dur region* time* (pctaidIO_wdi = ht_co lnpop wdi_trade), robust
 outreg2 using E:\auto3.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "19.814")
 ivreg2 ti_cpi gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidIO_wdi = ht_co lnpop wdi_trade), robust 
@@ -277,7 +286,8 @@ outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CPI C)  addtext(Re
 ivreg2 wbgi_cce gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidC_wdi = ht_co lnpop wdi_trade), robust 
 outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
 
-*table7
+*****table7***** (Two-stage GMM)
+
 xtabond2 bci  pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm( fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidIO_wdi, lag(2 .)) two robust orthogonal
 outreg2 using E:\auto4.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo dizzle")
 xtabond2 ti_cpi pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm(fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidIO_wdi, lag(2 .)) two robust orthogonal
@@ -292,7 +302,8 @@ xtabond2 wbgi_cce pctaidC_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( 
 outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM for real")
 
 
-*table8
+*****table8***** (Two-stage GMM)
+
  xtabond2 pctaidIO_wdi bci_bci wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(bci_bci, lag(2 .)) two robust orthogonal
 outreg2 using E:\auto6.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, GMM?, "GMM for real")
  xtabond2 pctaidIO_wdi ti_cpi wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(ti_cpi, lag(2 .)) two robust orthogonal
