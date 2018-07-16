@@ -152,7 +152,8 @@ label var pctaidC_wdi "C precent of aid of GDP from WDI"
 
 save "Save Base Dataset", replace
 
-*****Merging the country names to my data set***** (Yeah this probably could have been done an easier way)
+*****Merging the country names to my data set (Yeah this probably could have been done an easier way)*****
+*****The reason that I did this ugly merge is that for some reason I could not collapse a string and a intger at the same time*****
 
 use "Base Date Set", clear
 keep ccode cname year
@@ -160,7 +161,7 @@ gen year5 = 5*floor(year/5) if year >= 1946
 drop year
 collapse (last) cname, by (ccode year) 
 save "Merge Data set"
-merge 1:1 ccode year5 using "E:\690\Data Sets\9 21 data sets\base3.dta"
+merge 1:1 ccode year5 using "Merge Data Set"
 
 save "Base Dataset2", replace
 
