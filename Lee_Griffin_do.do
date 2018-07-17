@@ -1,9 +1,10 @@
 *****Hi! so below is the entire do file from my master’s thesis, *****
+
 *****the beginning is just collapsing and relabeling variables (22 - 139)*****
 *****the middle is mostly cleaning data and setting things up 140 - 217)*****
 *****the end are my regressions (217 - 304)*****
 
-use "Base Dateset Here", clear*****
+use "Standard QOG Dateset Here", clear
 
 egen comb_gini5 = rmean( ds_gini wdi_gini)
 label var comb_gini5 "Averaged Gini Scores"
@@ -14,8 +15,8 @@ gen wdi_realgdp = wdi_gdpcapcur * wdi_pop
 
 local startyear "1946"
 
-*****I collapsed my original dataset into 5-year panels, I only started with 5*****
-*****or so variables, but little by little that grew to 76 variables*****
+*****I collapsed my original dataset into 5-year panels, I only started with 5 or so variables*****
+*****...but little by little that grew to 76 variables, and now I look like a crazy person for relabeling them all*****
 
 gen year5 = 5*floor(year/5) if year >= `startyear'
 
@@ -56,10 +57,10 @@ rename wdi_gini wdi_gini5
 rename aid_crsc aid_crsc5
 rename aid_crsio aid_crsio5
 
-*****Relabeling Vars*****
+*****Relabeling Vars*****-->(Its a little excessive)
 
 label var arda_chprtpct "% of pop is prodestent"
-label var dpi_cemo "is chief exutive a milaty officer?"
+label var dpi_cemo "is chief exutive a military officer?"
 label var ht_region "region"
 label var wdi_gdpind "% of gdp that comes from industy"
 label var wdi_gdpser "% of gdp that comes from services"
@@ -138,7 +139,7 @@ label var p_durable "regeium durabilty"
 
 *****save "Optional Save of Base Dataset", replace*****
 
-*****creating new independent variables*****
+*****creating new independent variables***** -->(These are my foreign aid varibles (aid as a % of GDP))
 
 gen pctaidIO_wdi = aid_crsio/wdi_realgdp
 gen pctaidIO_gle = aid_crsio/gle_gdp2
@@ -165,7 +166,7 @@ merge 1:1 ccode year5 using "Merge Data Set"
 
 save "Base Dataset2", replace
 
-*****editing/ scaling my variables*****
+*****editing/ scaling my variables****
 
 replace ht_colonial = 1 if ht_colonial >= 1
 replace icrg_qog = (icrg/-1)
@@ -215,9 +216,9 @@ label var region8 "South Asia"
 label var region9 "The Pacific"
 label var region10 "The Caribbean"
 
-*****If you are using the final data sets, then you can start here*****
+*****If you are using the final data that was included, then you can start here*****
 
-*****regressions (tables 1 and 2 are sum stats)*****
+*****regressions (tables 1 and 2 are sum stats/descriptive stats)*****
 
 xtset ccode panel
 
@@ -226,98 +227,98 @@ ssc install outreg2
 ssc install xtabond2
 ssc install ivreg2
 
-*****you can take the outreg2's out, they are edited for my paper*****
+*****you can take the outreg2's, they are edited for my paper*****
 
 *****table3***** (Just a standard OLS)
 
 xtreg bci pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
-outreg2 using E:\auto5.doc, replace drop(time* region*) ctitle(BCI IO) 
+*outreg2 using E:\auto.doc, replace drop(time* region*) ctitle(BCI IO) 
 xtreg ti_cpi pctaidIO_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
-outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CPI IO)  
+*outreg2 using E:\auto.doc, append drop(time* region*) ctitle(CPI IO)  
 xtreg wbgi_cce pctaidIO_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
-outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CCE IO)  
+*outreg2 using E:\auto.doc, append drop(time* region*) ctitle(CCE IO)  
 xtreg bci pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable,  robust
-outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(BCI C)  
+*outreg2 using E:\auto.doc, append drop(time* region*) ctitle(BCI C)  
 xtreg ti_cpi pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable ,  robust
-outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CPI C) 
+*outreg2 using E:\auto.doc, append drop(time* region*) ctitle(CPI C) 
 xtreg wbgi_cce pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable , robust
-outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CCE C)  
+*outreg2 using E:\auto.doc, append drop(time* region*) ctitle(CCE C)  
 
 *****table4***** (Fixed Effect Model)
 
 xtreg bci pctaidIO_wdi gd_ptss wdi_lngdpcap p_durable  time* , fe 
-outreg2 using E:\auto.doc, replace drop(time*) ctitle(BCI IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
+*outreg2 using E:\auto2.doc, replace drop(time*) ctitle(BCI IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 xtreg ti_cpi pctaidIO_wdi gd_ptss  wdi_lngdpcap p_dur time*, fe
-outreg2 using E:\auto.doc, append drop(time*) ctitle(CPI IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
+*outreg2 using E:\auto2.doc, append drop(time*) ctitle(CPI IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 xtreg wbgi_cce pctaidIO_wdi gd_ptss wdi_lngdpcap p_dur time*, fe
-outreg2 using E:\auto.doc, append drop(time*) ctitle(CCE IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
+*outreg2 using E:\auto2.doc, append drop(time*) ctitle(CCE IO)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 xtreg bci pctaidC_wdi  gd_ptss  wdi_lngdpcap p_dur time*, fe
-outreg2 using E:\auto.doc, append drop(time*) ctitle(BCI C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
+*outreg2 using E:\auto2.doc, append drop(time*) ctitle(BCI C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 xtreg ti_cpi pctaidC_wdi  gd_ptss  wdi_lngdpcap p_dur time*, fe
-outreg2 using E:\auto.doc, append drop(time*) ctitle(CPI C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
+*outreg2 using E:\auto2.doc, append drop(time*) ctitle(CPI C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 xtreg wbgi_cce pctaidC_wdi  gd_ptss  wdi_lngdpcap p_dur time*, fe
-outreg2 using E:\auto.doc, append drop(time*) ctitle(CCE C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
+*outreg2 using E:\auto2.doc, append drop(time*) ctitle(CCE C)  addtext(Hanson J P-value, ".", Frist Stage F-Stat, ".", Counrty Fixed Effects, "Yes",Time Fixed Effects, "Yes")
 
 *****table5***** (Random Effects)
 
 xtreg bci pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
-outreg2 using E:\auto2.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
+*outreg2 using E:\auto3.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 xtreg ti_cpi pctaidIO_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
-outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
+*outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 xtreg wbgi_cce pctaidIO_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
-outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(CCE IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
+*outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CCE IO)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 xtreg bci pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
-outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(BCI C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
+*outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(BCI C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 xtreg ti_cpi pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
-outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(CPI C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
+*outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CPI C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 xtreg wbgi_cce pctaidC_wdi  gd_ptss fe_etfra wdi_lngdpcap p_durable region* time* , re robust
-outreg2 using E:\auto2.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
+*outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes", Random Effects, "Yes",Time Effects, "Yes")
 
 *****table6***** (IV 2SLS (No fixed effects))
 
 ivreg2 bci gd_ptss fe_etfra wdi_lngdpcap p_dur region* time* (pctaidIO_wdi = ht_co lnpop wdi_trade), robust
-outreg2 using E:\auto3.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "19.814")
+*outreg2 using E:\auto4.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "19.814")
 ivreg2 ti_cpi gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidIO_wdi = ht_co lnpop wdi_trade), robust 
-outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
+*outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
 ivreg2 wbgi_cce gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidIO_wdi = ht_co lnpop wdi_trade), robust 
-outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CCE IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
+*outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CCE IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
 ivreg2 bci gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidC_wdi = ht_co lnpop wdi_trade), robust 
-outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(BCI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
+*outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(BCI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
 ivreg2 ti_cpi gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidC_wdi = ht_co lnpop wdi_trade), robust 
-outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CPI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
+*outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CPI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
 ivreg2 wbgi_cce gd_ptss  fe_etfra wdi_lngdpcap  p_dur region* time* (pctaidC_wdi = ht_co lnpop wdi_trade), robust 
-outreg2 using E:\auto3.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
+*outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", Cragg_Donald F Stat, "16.234")
 
 *****table7***** (Two-stage GMM)
 
 xtabond2 bci  pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm( fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidIO_wdi, lag(2 .)) two robust orthogonal
-outreg2 using E:\auto4.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo dizzle")
+*outreg2 using E:\auto5.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo dizzle")
 xtabond2 ti_cpi pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm(fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidIO_wdi, lag(2 .)) two robust orthogonal
-outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo sho")
+*outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo sho")
 xtabond2 wbgi_cce pctaidIO_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm(fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidIO_wdi, lag(2 .)) two robust orthogonal
-outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CCCE IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM yo dizzle")
+*outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CCCE IO)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM yo dizzle")
 xtabond2 bci pctaidC_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm(fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidC_wdi, lag(2 .)) two robust orthogonal
-outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(BCI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo shizzle")
+*outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(BCI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo shizzle")
 xtabond2 ti_cpi pctaidC_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm(fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidC_wdi, lag(2 .)) two robust orthogonal
-outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CPI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo hizzle")
+*outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CPI C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM fo hizzle")
 xtabond2 wbgi_cce pctaidC_wdi gd_ptss fe_etfra wdi_lngdpcap  p_dur  region*,iv( region* ) gmm(fe_etfra wdi_lngdpcap gd_ptss p_dur, lag( 1 .)collapse) gmm(pctaidC_wdi, lag(2 .)) two robust orthogonal
-outreg2 using E:\auto4.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM for real")
+*outreg2 using E:\auto5.doc, append drop(time* region*) ctitle(CCE C)  addtext(Regional Contorls, "Yes",Time Effects, "Yes", GMM?, "GMM for real")
 
 
 *****table8***** (Two-stage GMM)
 
- xtabond2 pctaidIO_wdi bci_bci wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(bci_bci, lag(2 .)) two robust orthogonal
+xtabond2 pctaidIO_wdi bci_bci wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(bci_bci, lag(2 .)) two robust orthogonal
 outreg2 using E:\auto6.doc, replace drop(time* region*) ctitle(BCI IO)  addtext(Regional Contorls, GMM?, "GMM for real")
- xtabond2 pctaidIO_wdi ti_cpi wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(ti_cpi, lag(2 .)) two robust orthogonal
+xtabond2 pctaidIO_wdi ti_cpi wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(ti_cpi, lag(2 .)) two robust orthogonal
 outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(CPI IO)  addtext(Regional Contorls, "Yes", GMM?, "GMM for real")
- xtabond2 pctaidIO_wdi wbgi_cce wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(wbgi_cce, lag(2 .)) two robust orthogonal
- outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(CCE IO)  addtext(Regional Contorls, "Yes", GMM?, "GMM for real")
- xtabond2 pctaidC_wdi bci_bci wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(bci_bci, lag(2 .)) two robust orthogonal
- outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(BCI D)  addtext(Regional Contorls, GMM?, "No")
- xtabond2 pctaidC_wdi ti_cpi wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(ti_cpi, lag(2 .)) two robust orthogonal
+xtabond2 pctaidIO_wdi wbgi_cce wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(wbgi_cce, lag(2 .)) two robust orthogonal
+outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(CCE IO)  addtext(Regional Contorls, "Yes", GMM?, "GMM for real")
+xtabond2 pctaidC_wdi bci_bci wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(bci_bci, lag(2 .)) two robust orthogonal
+outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(BCI D)  addtext(Regional Contorls, GMM?, "No")
+xtabond2 pctaidC_wdi ti_cpi wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(ti_cpi, lag(2 .)) two robust orthogonal
 outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(CPI D)  addtext(Regional Contorls, "Yes", GMM?, "its just")
- xtabond2 pctaidC_wdi wbgi_cce wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(wbgi_cce, lag(2 .)) two robust orthogonal
- outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(CCE D)  addtext(Regional Contorls, "Yes", GMM?, "endogiety")
+xtabond2 pctaidC_wdi wbgi_cce wdi_lngdpcap  wdi_mortinf ht_co wdi_trade region* ,iv(ht_co region*) gmm( wdi_lngdpcap, lag(2 .))  gmm(wdi_mortinf,lag(1 .)) gmm(wdi_trade, lag(1 .)) gmm(wbgi_cce, lag(2 .)) two robust orthogonal
+outreg2 using E:\auto6.doc, append drop(time* region*) ctitle(CCE D)  addtext(Regional Contorls, "Yes", GMM?, "endogiety")
 
 
 
